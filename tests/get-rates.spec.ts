@@ -27,7 +27,7 @@ test.describe('GET /api/currencies', () => {
 });
 
 test.describe('GET /api/rates/{currency}', () => {
-  test('returns rate for existing currency', async ({ request }) => {
+  test('returns rate for USD currency', async ({ request }) => {
     const response = await request.get(`/api/rates/${Currency.USD}`);
 
     expect(response.status()).toBe(StatusCodes.OK);
@@ -38,12 +38,47 @@ test.describe('GET /api/rates/{currency}', () => {
     expect(body.rate).toBeGreaterThan(0);
   });
 
-  test('returns 400 for lowercase currency code', async () => {});
-  test('returns 400 for too short currency code', async () => {});
-  test('returns 404 for unknown currency', async () => {});
+  test('returns rate for GBP currency', async ({ request }) => {
+    const response = await request.get(`/api/rates/${Currency.GBP}`);
+
+    expect(response.status()).toBe(StatusCodes.OK);
+
+    const body = await response.json();
+    expect(body.currency).toBe(Currency.GBP);
+    expect(typeof body.rate).toBe('number');
+    expect(body.rate).toBeGreaterThan(0);
+    expect(body.rate).toBeLessThan(1000000);
+  });
+
+  test('returns 400 for lowercase currency code', async ({ request }) => {
+    const response = await request.get(`/api/rates/usd`);
+
+    expect(response.status()).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  test('returns 400 for too short currency code', async ({ request }) => {
+    const response = await request.get(`/api/rates/US`);
+
+    expect(response.status()).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  test('returns 404 for unknown currency', async ({ request }) => {
+    const response = await request.get(`/api/rates/SEK`);
+
+    expect(response.status()).toBe(StatusCodes.NOT_FOUND);
+  });
 });
 
 test.describe('Other', () => {
-  test('returns 405 for unsupported method', async () => {});
-  test('returns 404 for unknown URL', async () => {});
+  test('returns 405 for unsupported method', async ({ request }) => {
+    const response = await request.patch('/api/currencies');
+
+    expect(response.status()).toBe(405);
+  });
+
+  test('returns 404 for unknown URL', async ({ request }) => {
+    const response = await request.get('/api/currenciesx');
+
+    expect(response.status()).toBe(404);
+  });
 });
