@@ -70,6 +70,15 @@ test.describe('GET /api/rates/{currency}', () => {
 });
 
 test.describe('Other', () => {
-  test('returns 405 for unsupported method', async () => {});
-  test('returns 404 for unknown URL', async () => {});
+  test('returns 405 for unsupported method', async ({ request }) => {
+    const response = await request.patch('/api/currencies');
+
+    expect(response.status()).toBe(405);
+  });
+
+  test('returns 404 for unknown URL', async ({ request }) => {
+    const response = await request.get('/api/currenciesx');
+
+    expect(response.status()).toBe(404);
+  });
 });
