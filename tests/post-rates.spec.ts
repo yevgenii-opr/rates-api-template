@@ -9,42 +9,49 @@ test.describe('POST /api/rates', () => {
     const responseDelete = await request.delete('/api/rates/CHF')
     expect(responseDelete.status()).toBe(204);
   });
+
   test('returns 400 for invalid currency code', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "usd", "rate": 0.95 }
     });
     expect(response.status()).toBe(400);
   });
+
   test('returns 400 for rate equal to 0', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "CHF", "rate": 0 }
     });
     expect(response.status()).toBe(400);
   });
+
   test('returns 400 for rate greater than 1000000', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "CHF", "rate": 1000001 }
     });
     expect(response.status()).toBe(400);
   });
+
   test('returns 400 for non-numeric rate', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "CHF", "rate": '1' }
     });
     expect(response.status()).toBe(400);
   });
+
   test('returns 400 for invalid JSON', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "CHF" }
     });
     expect(response.status()).toBe(400);
   });
+
   test('returns 409 when currency already exists', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "USD", "rate": 10 }
     });
     expect(response.status()).toBe(409);
   });
+
   test.skip('returns 413 for body larger than 10000 bytes', async ({ request }) => {
     const response = await request.post(`/api/rates`, {
       data: { "currency": "CHF", "rate": 10 }
